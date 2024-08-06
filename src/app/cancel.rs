@@ -35,7 +35,12 @@ pub async fn cancel_action(
         // Validates if this user is the order creator
         if user_pubkey != order.creator_pubkey {
             // We create a Message
-            send_new_order_msg(Some(order.id), Action::IsNotYourOrder, None, &event.pubkey).await;
+            send_cant_do_msg(
+                Some(order_id),
+                Some("Not allowed!".to_string()),
+                &event.pubkey,
+            )
+            .await;
         } else {
             // We publish a new replaceable kind nostr event with the status updated
             // and update on local database the status and new event id
