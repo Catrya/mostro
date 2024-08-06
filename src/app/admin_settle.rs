@@ -70,7 +70,12 @@ pub async fn admin_settle_action(
     }
 
     if order.status != Status::Dispute.to_string() {
-        send_new_order_msg(Some(order.id), Action::NotAllowedByStatus, None, &event.pubkey).await;
+        let error = format!(
+            "Can't settle an order with status different than {}!",
+            Status::Dispute
+        );
+        send_cant_do_msg(Some(order.id), Some(error), &event.pubkey).await;
+
         return Ok(());
     }
 

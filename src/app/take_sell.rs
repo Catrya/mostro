@@ -102,7 +102,11 @@ pub async fn take_sell_action(
     match order_status {
         Status::Pending | Status::WaitingBuyerInvoice => {}
         _ => {
-            send_new_order_msg(Some(order.id), Action::NotAllowedByStatus, None, &buyer_pubkey).await;
+            send_dm(
+                &buyer_pubkey,
+                format!("Order Id {order_id} was already taken!"),
+            )
+            .await?;
             return Ok(());
         }
     }
@@ -121,7 +125,11 @@ pub async fn take_sell_action(
     if order_status == Status::WaitingBuyerInvoice {
         if let Some(ref buyer) = order.buyer_pubkey {
             if buyer != &buyer_pubkey.to_string() {
-                send_new_order_msg(Some(order.id), Action::NotAllowedByStatus, None, &buyer_pubkey).await;
+                send_dm(
+                    &buyer_pubkey,
+                    format!("Order Id {order_id} was taken by another user!"),
+                )
+                .await?;
                 return Ok(());
             }
         }
