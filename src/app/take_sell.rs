@@ -37,7 +37,11 @@ pub async fn take_sell_action(
     if let Some(am) = get_fiat_amount_requested(&order, &msg) {
         order.fiat_amount = am;
     } else {
-        send_new_order_msg(Some(order.id), Action::OutOfRangeFiatAmount, None, &event.pubkey).await;
+        let error = format!(
+            "Amount requested is not correct, probably out of range min {:#?} - max {:#?}",
+            order.min_amount, order.max_amount
+        );
+        send_cant_do_msg(Some(order.id), Some(error), &event.pubkey).await;
         return Ok(());
     }
 
